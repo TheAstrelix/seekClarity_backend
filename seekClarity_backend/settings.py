@@ -158,3 +158,14 @@ CELERY_BROKER_URL = (
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+QDRANT_HOST = config('QDRANT_HOST', default='localhost')
+QDRANT_PORT = config('QDRANT_PORT', default=6333, cast=int)
+QDRANT_VECTOR_SIZE = config('QDRANT_VECTOR_SIZE', default=384, cast=int)
+QDRANT_COLLECTION = config('QDRANT_COLLECTION', default='documents')
+
+MISTRAL_API_KEY = config('MISTRAL_API_KEY', default='')
+MISTRAL_API_URL = config(
+    'MISTRAL_API_URL',
+    default='https://api.mistral.ai/v1/chat/completions'
+)

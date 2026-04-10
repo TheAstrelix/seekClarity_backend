@@ -52,6 +52,18 @@ services:
   #       - "5050:80"
   #     depends_on:
   #       - db
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ats_qdrant
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__ENABLE_UI: "true"
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: ats_rabbitmq
@@ -88,7 +100,46 @@ services:
       - MINIO_ENDPOINT=minio:9000
     volumes:
       - .:/app
+  celery_embedding:
+    build:
+      context: .
+      dockerfile: Dockerfile.embedding
+    container_name: ats_celery_embedding
+    command: celery -A seekClarity_backend worker -Q embedding --concurrency=2 --loglevel=info
+    restart: always
+    depends_on:
+      - rabbitmq
+      - db
+      - qdrant
+    env_file:
+      - .env
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - POSTGRES_HOST=db
+      - MINIO_ENDPOINT=minio:9000
+      - QDRANT_HOST=qdrant
+    volumes:
+      - .:/app
+
+  celery_chat:
+    build:
+      context: .
+      dockerfile: Dockerfile.chat
+    container_name: ats_celery_chat
+    command: celery -A seekClarity_backend worker -Q chat_processing --concurrency=2 --loglevel=info
+    restart: always
+    depends_on:
+      - rabbitmq
+      - db
+    env_file:
+      - .env
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - POSTGRES_HOST=db
+    volumes:
+      - .:/app
 
 volumes:
   postgres_data:
   minio_data:
+  qdrant_data:

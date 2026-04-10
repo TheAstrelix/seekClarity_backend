@@ -31,6 +31,7 @@ class Document(models.Model):
     file_name = models.CharField(max_length=255)
     file_url = models.TextField()
     object_name = models.CharField(max_length=500, null=True, blank=True)
+    total_pages = models.IntegerField(null=True, blank=True)
 
     status = models.CharField(
         max_length=20,
@@ -86,3 +87,93 @@ class DocumentPage(models.Model):
 
     def __str__(self):
         return f"{self.document.id} - Page {self.page_number}"
+
+
+class ChatSession(models.Model):
+    session = models.ForeignKey("Session", on_delete=models.CASCADE)
+    document = models.ForeignKey("Document", on_delete=models.CASCADE)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("session", "document")
+        indexes = [
+            models.Index(fields=["session", "document"]),
+        ]
+
+class ChatMessage(models.Model):
+
+    ROLE_CHOICES = [
+        ("user", "User"),
+        ("assistant", "Assistant"),
+    ]
+
+    INTENT_CHOICES = [
+        ("question", "Question"),
+        ("summary", "Summary"),
+        ("highlight", "Highlight"),
+        ("generate_questions", "Generate Questions"),
+        ("global_query", "Global Query"),
+    ]
+
+    STATUS_CHOICES = [
+        ("processing", "Processing"),
+        ("done", "Done"),
+        ("failed", "Failed"),
+    ]
+
+    chat = models.ForeignKey(
+        "ChatSession",
+        on_delete=models.CASCADE,
+        related_name="messages"
+    )
+
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    intent = models.CharField(max_length=30, choices=INTENT_CHOICES)
+
+    content = models.TextField()
+
+    # 🔥 async tracking
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="processing"
+    )
+
+    error = models.TextField(null=True, blank=True)
+
+    # 🔥 context
+    page = models.ForeignKey(
+        "DocumentPage",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="chat_messages"
+    )
+
+    selected_text = models.TextField(null=True, blank=True)
+
+    # 🔥 structured outputs (questions, etc.)
+    metadata = models.JSONField(null=True, blank=True)
+
+    # 🔥 follow-up threading
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="replies"
+    )
+
+    # 🔥 OPTIONAL (huge optimization)
+    embedding = models.JSONField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        indexes = [
+            models.Index(fields=["chat", "created_at"]),
+            models.Index(fields=["chat", "page"]),
+            models.Index(fields=["status"]),
+        ]
