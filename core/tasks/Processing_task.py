@@ -83,8 +83,8 @@ def process_document(self, document_id):
                     )
 
                     # 🔹 Build public URL
-                    # image_url = minio_service.get_file_url(image_name)
-                    image_url = f"http://localhost:9000/{minio_service.bucket_name}/{image_name}"
+                    image_url = minio_service.get_file_url(image_name)
+                    # image_url = f"http://localhost:9000/{minio_service.bucket_name}/{image_name}"
 
                     # 🔹 Save final page data
                     page_obj.text_content = text

@@ -30,6 +30,22 @@ class MinioService:
         if not self.client.bucket_exists(self.bucket_name):
             self.client.make_bucket(self.bucket_name)
 
+            policy = f"""
+            {{
+            "Version": "2012-10-17",
+            "Statement": [
+                {{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": ["s3:GetObject"],
+                "Resource": ["arn:aws:s3:::{self.bucket_name}/*"]
+                }}
+            ]
+            }}
+            """
+
+            self.client.set_bucket_policy(self.bucket_name, policy)
+
 
     def upload_file(self, file, folder="uploads"):
         object_name = f"{folder}/{uuid.uuid4()}_{file.name}"
@@ -62,7 +78,8 @@ class MinioService:
         return self.get_file_url(object_name)
 
     def get_file_url(self, object_name):
-        return f"http://{settings.MINIO_ENDPOINT}/{self.bucket_name}/{object_name}"
+        base_url = getattr(settings, "MINIO_PUBLIC_URL", "http://localhost:9000")
+        return f"{base_url}/{self.bucket_name}/{object_name}"
 
     def delete_file(self, object_name):
         self.client.remove_object(self.bucket_name, object_name)

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -129,6 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -144,6 +146,7 @@ MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default='seek_clarity_admin')
 MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default='seek_clarity_admin')
 MINIO_BUCKET = config('MINIO_BUCKET', default='books')
 MINIO_SECURE = config('MINIO_SECURE', default=False, cast=bool)
+MINIO_PUBLIC_URL = config('MINIO_PUBLIC_URL', default='http://localhost:9000')
 
 RABBITMQ_HOST = config('RABBITMQ_HOST', default='localhost')
 RABBITMQ_PORT = config('RABBITMQ_PORT', default=5672, cast=int)

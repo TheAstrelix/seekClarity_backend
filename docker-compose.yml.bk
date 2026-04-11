@@ -1,28 +1,20 @@
 version: '3.9'
 
 services:
-  # ========================
-  # BACKEND (Django)
-  # ========================
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    container_name: ats_backend
-    restart: always
-    depends_on:
-      - db
-      - rabbitmq
-      - minio
-      - qdrant
-    env_file:
-      - .env
-    ports:
-      - "8000:8000"
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.backend
+  #   container_name: ats_backend
+  #   restart: always
+  #   ports:
+  #     - "8000:8000"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #     - minio
 
-  # ========================
-  # DATABASE
-  # ========================
   db:
     image: postgres:15
     container_name: ats_postgres
@@ -31,17 +23,16 @@ services:
       POSTGRES_DB: seek_clarity_db
       POSTGRES_USER: seek_clarity_user
       POSTGRES_PASSWORD: seek_clarity_password
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # ========================
-  # MINIO (Storage)
-  # ========================
   minio:
     image: minio/minio
     container_name: ats_minio
-    command: server /data --console-address ":9001"
     restart: always
+    command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: seek_clarity_admin
       MINIO_ROOT_PASSWORD: seek_clarity_admin
@@ -50,33 +41,47 @@ services:
       - "9001:9001"
     volumes:
       - minio_data:/data
-
-  # ========================
-  # QDRANT (Vector DB)
-  # ========================
+  # pgadmin:
+  #     image: dpage/pgadmin4
+  #     container_name: ats_pgadmin
+  #     restart: always
+  #     environment:
+  #       PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #       PGADMIN_DEFAULT_PASSWORD: admin
+  #     ports:
+  #       - "5050:80"
+  #     depends_on:
+  #       - db
   qdrant:
     image: qdrant/qdrant:latest
     container_name: ats_qdrant
     restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__ENABLE_UI: "true"
 
-  # ========================
-  # RABBITMQ (Queue)
-  # ========================
   rabbitmq:
     image: rabbitmq:3-management
     container_name: ats_rabbitmq
     restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: seek_clarity_admin
       RABBITMQ_DEFAULT_PASS: seek_clarity_admin
-    ports:
-      - "15672:15672"
 
-  # ========================
-  # CELERY WORKERS
-  # ========================
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   celery_processing:
     build:
       context: .
@@ -87,10 +92,14 @@ services:
     depends_on:
       - rabbitmq
       - db
-      - minio
     env_file:
       - .env
-
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - POSTGRES_HOST=db
+      - MINIO_ENDPOINT=minio:9000
+    volumes:
+      - .:/app
   celery_embedding:
     build:
       context: .
@@ -102,9 +111,15 @@ services:
       - rabbitmq
       - db
       - qdrant
-      - minio
     env_file:
       - .env
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - POSTGRES_HOST=db
+      - MINIO_ENDPOINT=minio:9000
+      - QDRANT_HOST=qdrant
+    volumes:
+      - .:/app
 
   celery_chat:
     build:
@@ -118,10 +133,12 @@ services:
       - db
     env_file:
       - .env
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - POSTGRES_HOST=db
+    volumes:
+      - .:/app
 
-# ========================
-# VOLUMES
-# ========================
 volumes:
   postgres_data:
   minio_data:
