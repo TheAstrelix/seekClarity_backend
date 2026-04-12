@@ -47,59 +47,69 @@ def build_summary_prompt(content, page_number=None, previous_content=None):
     previous_context = ""
     if previous_content:
         previous_context = f"""
-    Context from previous page(s):
-    {previous_content}
-    
-    """
+Previous page context:
+{previous_content}
+
+---
+
+"""
     
     return f"""
-    Summarize the following content {page_context}.
-    
-    Requirements:
-    - Provide 4-5 sentences (detailed but focused)
-    - Include all key concepts and main ideas
-    - Use simple, clear language
-    - Use **bold** for important terms and concepts
-    - Use markdown formatting for readability
-    - If there's previous context, connect related concepts
+Summarize the following content {page_context}.
 
-    {previous_context}Current page content:
-    {content}
-    """
+Requirements:
+- Provide 4-5 sentences (detailed but focused)
+- Include all key concepts and main ideas
+- Use simple, clear language
+- Use **bold** for important terms and concepts
+- NO preamble like "Here's a summary:" or "Here's the content:"
+- NO introductory phrases
+- Go directly into the content
+- NO separators like "---"
+
+{previous_context}Current page content:
+{content}
+"""
 
 
 def build_highlight_prompt(content, page_number=None):
     page_context = f"from page {page_number}" if page_number else ""
     return f"""
-    Extract the most important highlights and key points {page_context}.
+Extract the most important highlights and key points {page_context}.
 
-    Requirements:
-    - Return 3-5 bullet points maximum
-    - Only the most critical information
-    - Keep each point to one line
-    - Format as markdown bullet list (- for bullets)
-    - Use **bold** for key terms and concepts
+Requirements:
+- Return 3-5 bullet points maximum
+- Only the most critical information
+- Keep each point to one line
+- Format as markdown bullet list (- for bullets)
+- Use **bold** for key terms and concepts
+- NO preamble or introductory text
+- Go directly to bullet points
+- NO separators like "---"
 
-    Content:
-    {content}
-    """
+Content:
+{content}
+"""
 
 
 def build_question_prompt(content, page_number=None):
     page_context = f"based on page {page_number}" if page_number else ""
     return f"""
-    Generate 2-3 important study questions {page_context}.
+Generate 2-3 important study questions {page_context}.
 
-    Requirements:
-    - Questions should test understanding of key concepts
-    - Format as numbered markdown list (1. 2. 3.)
-    - Each question on one line
-    - Mix of factual and analytical questions
-    - Use **bold** for important terms
+Requirements:
+- Questions should test understanding of key concepts
+- Format as numbered markdown list (1. 2. 3.)
+- Each question on one line
+- Mix of factual and analytical questions
+- Use **bold** for important terms
+- NO preamble or explanatory text before questions
+- Go directly to questions
+- NO separators like "---"
 
-    Content:
-    {content}
-    """
+Content:
+{content}
+"""
 
 
 def build_rag_prompt(context, question):
