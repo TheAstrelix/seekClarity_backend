@@ -57,7 +57,7 @@ Rules:
 - Keep it concise
 - Focus on key ideas
 - No extra explanation
-- In plain text only
+- In plain text only, no bold word write only in plain text
 
 Content:
 {content}
