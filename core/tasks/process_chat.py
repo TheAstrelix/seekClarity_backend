@@ -5,11 +5,10 @@ from core.models import ChatMessage
 
 from core.services.llm import (
     summary_agent,
-    build_qa_prompt,
     question_agent,
-    rag_agent,
+    qa_agent,
     detect_intent,
-    detect_follow_up_llm   # 🔥 NEW
+    detect_follow_up_llm
 )
 
 
@@ -36,13 +35,13 @@ def process_chat_message(self, message_id):
             answer = summary_agent(msg)
 
         elif intent == "highlight":
-            answer = build_qa_prompt(msg)
+            answer = qa_agent(msg, is_follow_up)
 
         elif intent == "generate_questions":
             answer = question_agent(msg)
 
         else:
-            answer = rag_agent(msg, is_follow_up)
+            answer = qa_agent(msg, is_follow_up)
 
         # 🔹 STEP 4: SAVE RESPONSE
         ChatMessage.objects.create(
