@@ -5,7 +5,7 @@ from core.models import ChatMessage
 
 from core.services.llm import (
     summary_agent,
-    highlight_agent,
+    build_qa_prompt,
     question_agent,
     rag_agent,
     detect_intent,
@@ -36,7 +36,7 @@ def process_chat_message(self, message_id):
             answer = summary_agent(msg)
 
         elif intent == "highlight":
-            answer = highlight_agent(msg)
+            answer = build_qa_prompt(msg)
 
         elif intent == "generate_questions":
             answer = question_agent(msg)
