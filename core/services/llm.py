@@ -61,7 +61,7 @@ Requirements:
 - Provide 4-5 sentences (detailed but focused)
 - Include all key concepts and main ideas
 - Use simple, clear language
-- Use **bold** for important terms and concepts
+- write in simple plain text not bold no special words
 - NO preamble like "Here's a summary:" or "Here's the content:"
 - NO introductory phrases
 - Go directly into the content
@@ -82,7 +82,7 @@ Requirements:
 - Only the most critical information
 - Keep each point to one line
 - Format as markdown bullet list (- for bullets)
-- Use **bold** for key terms and concepts
+- write in simple plain text not bold no special words
 - NO preamble or introductory text
 - Go directly to bullet points
 - NO separators like "---"
@@ -102,7 +102,7 @@ Requirements:
 - Format as numbered markdown list (1. 2. 3.)
 - Each question on one line
 - Mix of factual and analytical questions
-- Use **bold** for important terms
+- write in simple plain text not bold no special words
 - NO preamble or explanatory text before questions
 - Go directly to questions
 - NO separators like "---"
