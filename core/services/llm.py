@@ -57,6 +57,7 @@ Rules:
 - Keep it concise
 - Focus on key ideas
 - No extra explanation
+- In plain text only
 
 Content:
 {content}
@@ -77,8 +78,7 @@ Answer the question using ONLY the provided content{page_context}.
 
 Rules:
 - Give a direct answer
-- If answer exists, extract it clearly
-- If not found, say: "Not found in content"
+- If answer exists, extract it clearly, if answer not found think about what is question and answer it accordingly
 - Keep it short
 - No extra explanation
 - Plain text only
