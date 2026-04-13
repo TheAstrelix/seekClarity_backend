@@ -53,11 +53,18 @@ Summarize the following content {page_context}.
 {previous_context}
 {forward_context}
 
-Rules:
-- Keep it concise
-- Focus on key ideas
-- No extra explanation
-- In plain text only, no bold word write only in plain text
+STRICT RULES:
+- Maximum 4-5 bullet points only
+- Each bullet must be ONE short sentence
+- Total length must NOT exceed 80 words
+- DO NOT rewrite the full content
+- DO NOT include contact info, links, or personal details
+- Focus only on key skills, experience, and impact
+- Output must be plain text (no markdown, no bold, no formatting symbols except "-")
+
+If the input looks like a resume or profile:
+- Extract only core highlights (skills, experience, achievements)
+- Compress aggressively
 
 Content:
 {content}
